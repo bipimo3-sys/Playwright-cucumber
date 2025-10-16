@@ -15,7 +15,6 @@ Feature: Login functionality
   Scenario: Login button is visible and enabled
     Given I open the login page
     Then I should see the login button enabled
-    
 
   Scenario: Attempt login without input
     Given I open the login page

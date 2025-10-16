@@ -1,10 +1,9 @@
 // support/hooks.js
-import { Before, After, Status } from "@cucumber/cucumber";
+import { Before, After, AfterStep, Status } from "@cucumber/cucumber";
 import { chromium } from "playwright";
 import fs from "fs";
 import path from "path";
 
-// Global variables accessible in steps
 let browser;
 let page;
 
@@ -15,25 +14,29 @@ Before(async function () {
   this.page = page;
 });
 
-After(async function ({ result, pickle }) {
-  const testName = pickle.name.replace(/\s+/g, "_");
-  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+function sanitizeFilename(name) {
+  return name.replace(/[^a-zA-Z0-9-_]/g, "_");
+}
 
-  // Take screenshot on failure
+AfterStep(async function ({ result, pickle, pickleStep }) {
   if (result.status === Status.FAILED && this.page) {
+    const testName = sanitizeFilename(pickle.name);
+    const stepName = sanitizeFilename(pickleStep.text);
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+
     const screenshotsDir = path.join(process.cwd(), "screenshots");
     if (!fs.existsSync(screenshotsDir)) fs.mkdirSync(screenshotsDir);
 
     const screenshotPath = path.join(
       screenshotsDir,
-      `${testName}-${timestamp}.png`
+      `${testName}-${stepName}-${timestamp}.png`
     );
-    await this.page.screenshot({ path: screenshotPath, fullPage: true });
-    console.log(`📸 Screenshot saved: ${screenshotPath}`);
-  }
 
-  // Close browser
-  if (this.browser) {
-    await this.browser.close();
+    await this.page.screenshot({ path: screenshotPath, fullPage: true });
+    console.log(`📸 Screenshot of failed step saved: ${screenshotPath}`);
   }
+});
+
+After(async function () {
+  if (this.browser) await this.browser.close();
 });
