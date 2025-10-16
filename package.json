@@ -7,7 +7,7 @@
   "scripts": {
     "gitpush": "git add . && git commit -m \"committed\" && git push origin main",
     "start-server": "node server.js",
-    "test": "cucumber-js --require steps/**/*.js --require support/**/*.js --publish-quiet"
+    "test": "cucumber-js --import steps/**/*.js --import support/**/*.js"
   },
   "keywords": [],
   "author": "",
