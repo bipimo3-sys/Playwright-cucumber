@@ -13,8 +13,8 @@ When(
   async function (username, password) {
     if (username === "<USERNAME>") username = process.env.TS1_USERNAME;
     if (password === "<PASSWORD>") password = process.env.TS1_PASSWORD;
-    //await this.page.fill("#username", username);
-    await this.page.fill("#username", "adminnn");
+    await this.page.fill("#username", username);
+    //await this.page.fill("#username", "adminnn");
     await this.page.fill("#password", password);
   }
 );
