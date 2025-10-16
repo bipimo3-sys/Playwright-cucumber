@@ -1,0 +1,39 @@
+// support/hooks.js
+import { Before, After, Status } from "@cucumber/cucumber";
+import { chromium } from "playwright";
+import fs from "fs";
+import path from "path";
+
+// Global variables accessible in steps
+let browser;
+let page;
+
+Before(async function () {
+  browser = await chromium.launch({ headless: true });
+  page = await browser.newPage();
+  this.browser = browser;
+  this.page = page;
+});
+
+After(async function ({ result, pickle }) {
+  const testName = pickle.name.replace(/\s+/g, "_");
+  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+
+  // Take screenshot on failure
+  if (result.status === Status.FAILED && this.page) {
+    const screenshotsDir = path.join(process.cwd(), "screenshots");
+    if (!fs.existsSync(screenshotsDir)) fs.mkdirSync(screenshotsDir);
+
+    const screenshotPath = path.join(
+      screenshotsDir,
+      `${testName}-${timestamp}.png`
+    );
+    await this.page.screenshot({ path: screenshotPath, fullPage: true });
+    console.log(`📸 Screenshot saved: ${screenshotPath}`);
+  }
+
+  // Close browser
+  if (this.browser) {
+    await this.browser.close();
+  }
+});
