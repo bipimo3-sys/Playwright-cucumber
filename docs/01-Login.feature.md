@@ -1,6 +1,5 @@
 # Login.feature - Test Synopsis
 
-
 This feature verifies the **login page functionality and validation logic** of the ProjectTSApp.  
 It demonstrates **form interaction**, **environment variable usage**, **UI assertions**, **step-level screenshot capture**, and **error handling on failed steps**.
 
